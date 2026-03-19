@@ -49,11 +49,17 @@ int main () {
     // This code is test code to ensure the new motor PWM I calcuted is correct
     // I don't want to apply PWM to a motor without being sure it is safe and correct
     float new_pwm = drive.calc_pwm(OLD_WHEEL_DIAMETER, NEW_WHEEL_DIAMETER);
-    printf("Calculated new PWM duty cycle: %f\n", new_pwm);
 
+    // Code for debugging the new-motor PWM calculation
+    // stdio_init_all();
+    // while (1) {
+    //     printf("Calculated new PWM duty cycle: %f\n", new_pwm);
+    //     sleep_ms(1000);
+    // }
+    
     // Drive forward for 5 seconds (so 5000ms)
-    // drive.drive_forward();
-    // sleep_ms(STRAIGHT_LINE_TIME);
+    drive.drive_forward();
+    sleep_ms(STRAIGHT_LINE_TIME);
 
     // float speed_ratio = calc_speed_ratio(TURN_RADIUS, TRACK_WIDTH);
 
@@ -64,7 +70,8 @@ int main () {
     // drive.skid_left();
     // sleep_ms(SKID_STEERING_TIME);
 
-    // drive.brake();
+    // Brake to stop the rover
+    drive.brake();
 
     return 0;
 }

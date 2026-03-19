@@ -30,11 +30,12 @@
 
 #include "driving.hpp"
 
-Drive::Drive() {}
-
+Drive::Drive() {
+    new_motor_level = TOP * calc_pwm(OLD_WHEEL_DIAMETER, NEW_WHEEL_DIAMETER);
+    new_motor_pwm = calc_pwm(OLD_WHEEL_DIAMETER, NEW_WHEEL_DIAMETER);
+}
 
 // ---------------- PWM CONFIGURATION ----------------
-
 void Drive::init_pwm_mode() {
 
     uint slice1 = pwm_gpio_to_slice_num(MOTOR1_PWM_PIN);
@@ -93,11 +94,11 @@ void Drive::init_pwm(uint32_t pin, float duty) {
 
 float Drive::calc_pwm(float old_wheel_diameter, float new_wheel_diameter) {
     // Calculate the linear velocity of the old motors at 50% duty cycle in m/
-    float V = PI * old_wheel_diameter * OLD_MOTOR_RPM;
+    float V = PI * old_wheel_diameter * (OLD_MOTOR_RPM / 60.0f);
 
     // Now work backwards and figure out the PWM needed for the new motors
     // This calculates the RPM of the new motors at the same linear velocity as the old motors, given the new wheel diameter
-    float new_motor_rpm = V / (PI * new_wheel_diameter);
+    float new_motor_rpm = V / (PI * new_wheel_diameter) * 60.0f;
 
     // Return the value of the PWM duty cycle needed for the new motors 
     return (new_motor_rpm / OLD_MOTOR_RPM) * NORMAL_DUTY_CYCLE;
@@ -164,10 +165,10 @@ void Drive::set_motor_output(unsigned int speed_pin, unsigned int dir_pin, float
 // ---------------- BASIC MOVEMENT ----------------
 void Drive::drive_forward() {
 
-    set_motor_output(MOTOR1_PWM_PIN, MOTOR1_DIR_PIN, calc_pwm(OLD_WHEEL_DIAMETER, NEW_WHEEL_DIAMETER));
+    set_motor_output(MOTOR1_PWM_PIN, MOTOR1_DIR_PIN, new_motor_pwm);
     set_motor_output(MOTOR2_PWM_PIN, MOTOR2_DIR_PIN, NORMAL_DUTY_CYCLE);
     set_motor_output(MOTOR3_PWM_PIN, MOTOR3_DIR_PIN, NORMAL_DUTY_CYCLE);
-    set_motor_output(MOTOR4_PWM_PIN, MOTOR4_DIR_PIN, calc_pwm(OLD_WHEEL_DIAMETER, NEW_WHEEL_DIAMETER));
+    set_motor_output(MOTOR4_PWM_PIN, MOTOR4_DIR_PIN, new_motor_pwm);
     set_motor_output(MOTOR5_PWM_PIN, MOTOR5_DIR_PIN, NORMAL_DUTY_CYCLE);
     set_motor_output(MOTOR6_PWM_PIN, MOTOR6_DIR_PIN, NORMAL_DUTY_CYCLE);
 
@@ -185,13 +186,13 @@ float Drive::calc_speed_ratio(float turn_radius, float track_width) {
 void Drive::turn_left(float speed_ratio) {
 
     float old_motor_inner_pwm = OUTER_DUTY_CYCLE / speed_ratio;
-    float new_motor_inner_pwm = calc_pwm(OLD_WHEEL_DIAMETER, NEW_WHEEL_DIAMETER) / speed_ratio;
+    float new_motor_inner_pwm = new_motor_pwm / speed_ratio;
 
     pwm_set_gpio_level(MOTOR1_PWM_PIN, new_motor_inner_pwm * TOP);
     pwm_set_gpio_level(MOTOR2_PWM_PIN, old_motor_inner_pwm * TOP);
     pwm_set_gpio_level(MOTOR3_PWM_PIN, old_motor_inner_pwm * TOP);
 
-    pwm_set_gpio_level(MOTOR4_PWM_PIN, calc_pwm(OLD_WHEEL_DIAMETER, NEW_WHEEL_DIAMETER) * TOP);
+    pwm_set_gpio_level(MOTOR4_PWM_PIN, new_motor_pwm * TOP);
     pwm_set_gpio_level(MOTOR5_PWM_PIN, OUTER_DUTY_CYCLE * TOP);
     pwm_set_gpio_level(MOTOR6_PWM_PIN, OUTER_DUTY_CYCLE * TOP);
 }
@@ -199,9 +200,9 @@ void Drive::turn_left(float speed_ratio) {
 void Drive::turn_right(float speed_ratio) {
 
     float old_motor_inner_pwm = OUTER_DUTY_CYCLE / speed_ratio;
-    float new_motor_inner_pwm = calc_pwm(OLD_WHEEL_DIAMETER, NEW_WHEEL_DIAMETER) / speed_ratio;
+    float new_motor_inner_pwm = new_motor_pwm / speed_ratio;
 
-    pwm_set_gpio_level(MOTOR1_PWM_PIN, calc_pwm(OLD_WHEEL_DIAMETER, NEW_WHEEL_DIAMETER) * TOP);
+    pwm_set_gpio_level(MOTOR1_PWM_PIN, new_motor_pwm * TOP);
     pwm_set_gpio_level(MOTOR2_PWM_PIN, OUTER_DUTY_CYCLE * TOP);
     pwm_set_gpio_level(MOTOR3_PWM_PIN, OUTER_DUTY_CYCLE * TOP);
 
@@ -225,10 +226,10 @@ void Drive::skid_left() {
     gpio_put(MOTOR5_DIR_PIN, 0);
     gpio_put(MOTOR6_DIR_PIN, 0);
 
-    pwm_set_gpio_level(MOTOR1_PWM_PIN, TOP * calc_pwm(OLD_WHEEL_DIAMETER, NEW_WHEEL_DIAMETER));
+    pwm_set_gpio_level(MOTOR1_PWM_PIN, TOP * new_motor_pwm);
     pwm_set_gpio_level(MOTOR2_PWM_PIN, TOP * NORMAL_DUTY_CYCLE);
     pwm_set_gpio_level(MOTOR3_PWM_PIN, TOP * NORMAL_DUTY_CYCLE);
-    pwm_set_gpio_level(MOTOR4_PWM_PIN, TOP * calc_pwm(OLD_WHEEL_DIAMETER, NEW_WHEEL_DIAMETER));
+    pwm_set_gpio_level(MOTOR4_PWM_PIN, TOP * new_motor_pwm);
     pwm_set_gpio_level(MOTOR5_PWM_PIN, TOP * NORMAL_DUTY_CYCLE);
     pwm_set_gpio_level(MOTOR6_PWM_PIN, TOP * NORMAL_DUTY_CYCLE);
 }
@@ -246,10 +247,10 @@ void Drive::skid_right() {
     gpio_put(MOTOR5_DIR_PIN, 1);
     gpio_put(MOTOR6_DIR_PIN, 1);
 
-    pwm_set_gpio_level(MOTOR1_PWM_PIN, TOP * calc_pwm(OLD_WHEEL_DIAMETER, NEW_WHEEL_DIAMETER));
+    pwm_set_gpio_level(MOTOR1_PWM_PIN, TOP * new_motor_pwm);
     pwm_set_gpio_level(MOTOR2_PWM_PIN, TOP * NORMAL_DUTY_CYCLE);
     pwm_set_gpio_level(MOTOR3_PWM_PIN, TOP * NORMAL_DUTY_CYCLE);
-    pwm_set_gpio_level(MOTOR4_PWM_PIN, TOP * calc_pwm(OLD_WHEEL_DIAMETER, NEW_WHEEL_DIAMETER));
+    pwm_set_gpio_level(MOTOR4_PWM_PIN, TOP * new_motor_pwm);
     pwm_set_gpio_level(MOTOR5_PWM_PIN, TOP * NORMAL_DUTY_CYCLE);
     pwm_set_gpio_level(MOTOR6_PWM_PIN, TOP * NORMAL_DUTY_CYCLE);
 }
