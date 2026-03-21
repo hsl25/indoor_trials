@@ -10,9 +10,9 @@
 // ==================== PWM and steering defines ====================
 #define PWM_PHASE_CORRECT 1
 #define CLOCKS_PER_SEC 1000000
-#define STRAIGHT_LINE_TIME 30000
+#define STRAIGHT_LINE_TIME 5000
 #define TURN_TIME 5000
-#define SKID_STEERING_TIME 5000
+#define SKID_STEERING_TIME 20000
 #define TOP 3124
 #define DIVIDER 1
 #define NORMAL_DUTY_CYCLE 0.5

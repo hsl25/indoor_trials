@@ -66,9 +66,9 @@ int main () {
     // turn_left(speed_ratio);
     // sleep_ms(TURN_TIME);
 
-    // Steer left for 3 seconds (so 3000ms)
-    // drive.skid_left();
-    // sleep_ms(SKID_STEERING_TIME);
+    // Steer left for 5 seconds (so 5000ms)
+    drive.skid_left();
+    sleep_ms(SKID_STEERING_TIME);
 
     // Brake to stop the rover
     drive.brake();
