@@ -11,3 +11,7 @@ As part of the indoor trials, the rover was tasked with climbing over wooden blo
 ![Rover Indoor Trials](assets/indoor3.jpg)
 
 ![Rover Indoor Trials](assets/indoor4.jpg)
+
+![Rover Indoor Trials](assets/indoor5.png)
+
+![Rover Indoor Trials](assets/indoor6.png)
