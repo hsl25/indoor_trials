@@ -3,5 +3,11 @@
 ## Overview
 As part of the indoor trials, the rover was tasked with climbing over wooden blocks and ramps of increasing gradient. 
 
-## Indoor Trials Image 1
-![Rover Indoor Trials](assets/indoor_trial1.png)
+## Indoor Trials Images
+![Rover Indoor Trials](assets/indoor1.jpg)
+
+![Rover Indoor Trials](assets/indoor2.jpg)
+
+![Rover Indoor Trials](assets/indoor3.jpg)
+
+![Rover Indoor Trials](assets/indoor4.jpg)
